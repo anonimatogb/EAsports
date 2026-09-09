@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ranking;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller
@@ -27,9 +28,28 @@ $rankings = Ranking::all();
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'position'=> 'required|string|max:100',
+            'name_competitor' => 'required|string|max:100',
+            'name_coach' => 'required|string|max:100'
+        ]);
+
+        try {
+            $ranking = Ranking::create($validate);
+            return response()->json([
+                'message' => 'Ranking created successfully',
+                'ranking' => $ranking
+            ], 201);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Failed to create ranking'], 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+        }
     }
 
     /**
@@ -53,7 +73,22 @@ $rankings = Ranking::all();
      */
     public function update(Request $request, Ranking $ranking)
     {
-        //
+            $validated= $request->validate([
+            'position' => 'sometimes|required|string|max:255',
+            'name_competitor' => 'sometimes|required|string|max:255',
+            'name_coach' => 'sometimes|required|string|max:255'
+
+        ]);
+        try{
+
+        $ranking ->update($validated);
+        return response()->json([
+            'message' => 'Ranking updated successfully',
+            'ranking' => $ranking
+        ], 200);
+        }catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to update ranking', 'error' => $e -> getMessage()], 500);
+        }
     }
 
     /**

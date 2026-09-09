@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Modality;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class ModalityController extends Controller
@@ -27,9 +28,22 @@ $modalities = Modality::all();
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'name'=> 'required|string|max:100',
+            'description' => 'required|string|max:100',
+      ]);
+
+        try {
+            $modality = Modality::create($validate);
+            return response()->json([
+                'message' => 'Modality created successfully',
+                'modality' => $modality
+            ], 201);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Failed to create modality'], 500);
+        }
     }
 
     /**
@@ -53,7 +67,20 @@ $modalities = Modality::all();
      */
     public function update(Request $request, Modality $modality)
     {
-        //
+            $validated= $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string|max:255'
+        ]);
+        try{
+
+        $modality ->update($validated);
+        return response()->json([
+            'message' => 'Modality updated successfully',
+            'modality' => $modality
+        ], 200);
+        }catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to update modality', 'error' => $e -> getMessage()], 500);
+        }
     }
 
     /**

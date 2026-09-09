@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Coach;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class CoachController extends Controller
@@ -29,7 +30,24 @@ class CoachController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'name' => 'required|string|max:255',
+            'age' => 'required|integer',
+            'height' => 'required|numeric',
+            'weight' => 'required|numeric',
+            'cpf' => 'required|string|unique:coaches,cpf',
+            'rg' => 'required|string|unique:coaches,rg'
+        ]);
+
+        try {
+            $couch = Coach::create($validate);
+            return response()->json([
+                'message' => 'Coach created successfully',
+                'coach' => $couch
+            ], 201);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Failed to create coach'], 500);
+        }
     }
 
     /**
@@ -53,7 +71,24 @@ class CoachController extends Controller
      */
     public function update(Request $request, Coach $coach)
     {
-        //
+        $validated= $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'age' => 'sometimes|required|integer',
+            'height' => 'sometimes|required|numeric',
+            'weight' => 'sometimes|required|numeric',
+            'cpf' => 'sometimes|required|string|unique:coaches,cpf,' . $coach->id,
+            'rg' => 'sometimes|required|string|unique:coaches,rg,' . $coach->id
+        ]);
+        try{
+
+        $coach ->update($validated);
+        return response()->json([
+            'message' => 'Coach updated successfully',
+            'coach' => $coach
+        ], 200);
+        }catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to update coach', 'error' => $e -> getMessage()], 500);
+        }
     }
 
     /**

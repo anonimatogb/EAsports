@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Locality;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class LocalityController extends Controller
@@ -29,7 +30,25 @@ $localities = Locality::all();
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'street'=> 'required|string|max:100',
+            'neighborhood' => 'required|string|max:100',
+            'number' => 'required|integer',
+            'zip_code' => 'required|integer',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'country' => 'required|string|max:100'
+      ]);
+
+        try {
+            $locality = Locality::create($validate);
+            return response()->json([
+                'message' => 'Locality created successfully',
+                'locality' => $locality
+            ], 201);
+        } catch (QueryException $e) {
+            return response()->json(['error' => 'Failed to create locality'], 500);
+        }
     }
 
     /**
@@ -53,7 +72,25 @@ $localities = Locality::all();
      */
     public function update(Request $request, Locality $locality)
     {
-        //
+            $validated= $request->validate([
+            'street' => 'sometimes|required|string|max:100',
+            'neighborhood' => 'sometimes|required|string|max:100',
+            'number' => 'sometimes|required|integer',
+            'zip_code' => 'sometimes|required|integer',
+            'city' => 'sometimes|required|string|max:100',
+            'state' => 'sometimes|required|string|max:100',
+            'country' => 'sometimes|required|string|max:100'
+        ]);
+        try{
+
+        $locality ->update($validated);
+        return response()->json([
+            'message' => 'Locality updated successfully',
+            'locality' => $locality
+        ], 200);
+        }catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to update locality', 'error' => $e -> getMessage()], 500);
+        }
     }
 
     /**
