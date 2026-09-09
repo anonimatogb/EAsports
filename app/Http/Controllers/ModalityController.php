@@ -88,6 +88,11 @@ $modalities = Modality::all();
      */
     public function destroy(Modality $modality)
     {
-        //
-    }
+
+        try {
+            $modality->delete();
+            return response()->json(['message' => 'Modality deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to delete modality', 'error' => $e->getMessage()], 500);
+        }    }
 }

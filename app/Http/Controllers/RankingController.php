@@ -96,6 +96,12 @@ $rankings = Ranking::all();
      */
     public function destroy(Ranking $ranking)
     {
-        //
+
+        try {
+            $ranking->delete();
+            return response()->json(['message' => 'Ranking deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to delete ranking', 'error' => $e->getMessage()], 500);
+        }
     }
 }

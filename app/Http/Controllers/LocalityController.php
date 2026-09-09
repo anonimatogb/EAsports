@@ -98,6 +98,11 @@ $localities = Locality::all();
      */
     public function destroy(Locality $locality)
     {
-        //
-    }
+
+        try {
+            $locality->delete();
+            return response()->json(['message' => 'Locality deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to delete locality', 'error' => $e->getMessage()], 500);
+        }    }
 }

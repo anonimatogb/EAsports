@@ -98,6 +98,12 @@ $competitors = Competitor::all();
      */
     public function destroy(Competitor $competitor)
     {
-        //
+
+        try {
+            $competitor->delete();
+            return response()->json(['message' => 'Competitor deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to delete competitor', 'error' => $e->getMessage()], 500);
+        }
     }
 }

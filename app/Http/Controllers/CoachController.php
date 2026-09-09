@@ -96,6 +96,11 @@ class CoachController extends Controller
      */
     public function destroy(Coach $coach)
     {
-        //
+        try {
+            $coach->delete();
+            return response()->json(['message' => 'Coach deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Failed to delete coach', 'error' => $e->getMessage()], 500);
+        }
     }
 }
